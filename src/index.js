@@ -1,3 +1,3 @@
-import './styles/styles.scss';
+import css from './styles/styles.css'
 import {runthreejsdemo} from './threedemo';
-runthreejsdemo();
+setTimeout(runthreejsdemo, 0);
