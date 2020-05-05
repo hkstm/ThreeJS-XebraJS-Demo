@@ -1,142 +1,102 @@
 import * as THREE from 'three';
-import { OBJLoader  } from 'three/examples/jsm/loaders/OBJLoader.js';
-import modelObj from './models/female02.obj';
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
+import { PCDLoader } from 'three/examples/jsm/loaders/PCDLoader.js';
 
-var camera, scene, renderer;
-var geometry, material, mesh;
-var direction, speed;
-var loader = new OBJLoader();
+
+
 var container;
+var camera, controls, scene, renderer;
 
-var camera, scene, renderer;
-
-var mouseX = 0, mouseY = 0;
-
-var windowHalfX = window.innerWidth / 2;
-var windowHalfY = window.innerHeight / 2;
-
-var object;
+init();
+animate();
 
 function init() {
 
-    container = document.createElement( 'div' );
-    document.body.appendChild( container );
-
-    camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-    camera.position.z = 250;
-
-    // scene
-
     scene = new THREE.Scene();
+    scene.background = new THREE.Color( 0x000000 );
 
-    var ambientLight = new THREE.AmbientLight( 0xcccccc, 0.4 );
-    scene.add( ambientLight );
+    camera = new THREE.PerspectiveCamera( 15, window.innerWidth / window.innerHeight, 0.01, 40 );
+    camera.position.x = 0.4;
+    camera.position.z = - 2;
+    camera.up.set( 0, 0, 1 );
 
-    var pointLight = new THREE.PointLight( 0xffffff, 0.8 );
-    camera.add( pointLight );
     scene.add( camera );
 
-    // manager
-
-    function loadModel() {
-        console.log('in load model');
-
-        object.traverse( function ( child ) {
-            if ( child.isMesh ) child.material.map = texture;
-        } );
-
-        object.position.y = 50;
-
-
-        object.position.x = - 95;
-        scene.add( object );
-
-    }
-
-    var manager = new THREE.LoadingManager( loadModel );
-
-    manager.onProgress = function ( item, loaded, total ) {
-        console.log( item, loaded, total );
-    };
-
-    // texture
-
-    var textureLoader = new THREE.TextureLoader( manager );
-
-    var texture = textureLoader.load( 'https://i.imgur.com/MwYBcsY.jpg' );
-
-    // model
-
-    function onError(url) { }
-
-    function onProgress( xhr ) {
-
-        if ( xhr.lengthComputable ) {
-            var percentComplete = xhr.loaded / xhr.total * 100;
-            console.log( 'model ' + Math.round( percentComplete, 2 ) + '% downloaded' );
-        }
-    }
-
-    var loader = new OBJLoader( manager );
-    var modelLocUrl ='https://raw.githubusercontent.com/hkstm/ThreeJS-XebraJS-Demo/master/src/models/keelun.obj';
-    // var modelLocUrl ='https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/obj/male02/male02.obj';
-
-    loader.load( modelLocUrl, function ( obj ) {
-        object = obj;
-    }, onProgress, onError );
-
-    //
-
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer( { antialias: true } );
     renderer.setPixelRatio( window.devicePixelRatio );
     renderer.setSize( window.innerWidth, window.innerHeight );
+    document.body.appendChild( renderer.domElement );
+
+    var loader = new PCDLoader();
+    loader.load( 'https://raw.githubusercontent.com/hkstm/ThreeJS-XebraJS-Demo/master/src/models/keelun.pcd', function ( points ) {
+
+        scene.add( points );
+        var center = points.geometry.boundingSphere.center;
+        controls.target.set( center.x, center.y, center.z );
+        controls.update();
+
+    } );
+
+    container = document.createElement( 'div' );
+    document.body.appendChild( container );
     container.appendChild( renderer.domElement );
 
-    document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+    controls = new TrackballControls( camera, renderer.domElement );
 
-    //
+    controls.rotateSpeed = 2.0;
+    controls.zoomSpeed = 0.3;
+    controls.panSpeed = 0.2;
+
+    controls.staticMoving = true;
+
+    controls.minDistance = 0.3;
+    controls.maxDistance = 0.3 * 100;
 
     window.addEventListener( 'resize', onWindowResize, false );
+
+    window.addEventListener( 'keypress', keyboard );
 
 }
 
 function onWindowResize() {
 
-    windowHalfX = window.innerWidth / 2;
-    windowHalfY = window.innerHeight / 2;
-
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-
     renderer.setSize( window.innerWidth, window.innerHeight );
+    controls.handleResize();
 
 }
 
-function onDocumentMouseMove( event ) {
+function keyboard( ev ) {
 
-    mouseX = ( event.clientX - windowHalfX ) / 2;
-    mouseY = ( event.clientY - windowHalfY ) / 2;
+    var points = scene.getObjectByName( 'keelun.pcd' );
+
+    switch ( ev.key || String.fromCharCode( ev.keyCode || ev.charCode ) ) {
+
+        case '+':
+            points.material.size *= 1.2;
+            points.material.needsUpdate = true;
+            break;
+
+        case '-':
+            points.material.size /= 1.2;
+            points.material.needsUpdate = true;
+            break;
+
+        case 'c':
+            points.material.color.setHex( Math.random() * 0xffffff );
+            points.material.needsUpdate = true;
+            break;
+
+    }
 
 }
-
-//
 
 function animate() {
 
     requestAnimationFrame( animate );
-    render();
-
-}
-
-function render() {
-
-    camera.position.x += ( mouseX - camera.position.x ) * .01;
-    camera.position.y += ( - mouseY - camera.position.y ) * .01;
-
-    camera.lookAt( scene.position );
-
+    controls.update();
     renderer.render( scene, camera );
-
 }
 
 function runthreejsdemo() {
