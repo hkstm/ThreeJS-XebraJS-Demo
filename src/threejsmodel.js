@@ -45,7 +45,10 @@ function init() {
             if ( child.isMesh ) child.material.map = texture;
         } );
 
-        object.position.y = - 95;
+        object.position.y = 50;
+        
+
+        object.position.x = - 95;
         scene.add( object );
 
     }
@@ -60,7 +63,7 @@ function init() {
 
     var textureLoader = new THREE.TextureLoader( manager );
 
-    var texture = textureLoader.load( 'textures/uv_grid_opengl.jpg' );
+    var texture = textureLoader.load( 'https://i.imgur.com/MwYBcsY.jpg' );
 
     // model
 
@@ -75,8 +78,10 @@ function init() {
     }
 
     var loader = new OBJLoader( manager );
+    var modelLocUrl ='https://raw.githubusercontent.com/hkstm/ThreeJS-XebraJS-Demo/master/src/models/krissidesshaved.obj';
+    // var modelLocUrl ='https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/obj/male02/male02.obj';
 
-    loader.load( modelObj, function ( obj ) {
+    loader.load( modelLocUrl, function ( obj ) {
         object = obj;
     }, onProgress, onError );
 
@@ -125,8 +130,8 @@ function animate() {
 
 function render() {
 
-    camera.position.x += ( mouseX - camera.position.x ) * .05;
-    camera.position.y += ( - mouseY - camera.position.y ) * .05;
+    camera.position.x += ( mouseX - camera.position.x ) * .01;
+    camera.position.y += ( - mouseY - camera.position.y ) * .01;
 
     camera.lookAt( scene.position );
 
