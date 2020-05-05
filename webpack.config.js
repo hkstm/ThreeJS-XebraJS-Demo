@@ -29,6 +29,10 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
       {
+        test: /\.obj$/,
+        loader: 'webpack-obj-loader'
+      },
+      {
         test: /\.(png|svg|jpg|gif)$/,
         loader: "file-loader",
         options: { name: '/static/[name].[ext]' }
