@@ -46,7 +46,7 @@ function init() {
         } );
 
         object.position.y = 50;
-        
+
 
         object.position.x = - 95;
         scene.add( object );
@@ -78,7 +78,7 @@ function init() {
     }
 
     var loader = new OBJLoader( manager );
-    var modelLocUrl ='https://raw.githubusercontent.com/hkstm/ThreeJS-XebraJS-Demo/master/src/models/krissidesshaved.obj';
+    var modelLocUrl ='https://raw.githubusercontent.com/hkstm/ThreeJS-XebraJS-Demo/master/src/models/keelun.obj';
     // var modelLocUrl ='https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/models/obj/male02/male02.obj';
 
     loader.load( modelLocUrl, function ( obj ) {
